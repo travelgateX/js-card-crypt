@@ -1,0 +1,10 @@
+// TSCONFIG SAMPLE
+{
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "target": "ES6"
+    }
+}
