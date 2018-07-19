@@ -1,16 +1,26 @@
 "use strict";
 
 var Card = (function() {
-  function Card(number, expiration_month, expiration_year, security_code) {
+  function Card(number, expiration_month, expiration_year, security_code, currentdate) {
     this.number = number;
     this.expiration_month = expiration_month;
     this.expiration_year = expiration_year;
     this.security_code = security_code;
     this.bin = number.substr(0,6);
     this.last4 = number.substr(-4)
+
+
+    this.token_creation_data = currentdate.getUTCFullYear() + "/" 
+                + getNormalizedData(currentdate.getUTCMonth()) + "/" 
+                + getNormalizedData(currentdate.getUTCDate()) + " "
+                + getNormalizedData(currentdate.getUTCHours()) + ":"  
+                + getNormalizedData(currentdate.getUTCMinutes()) + ":" 
+                + getNormalizedData(currentdate.getUTCSeconds()) ;
   }
   return Card;
 })();
+
+
 
 (function() {
   document.getElementById("card-button").addEventListener("click", function() {
@@ -19,17 +29,28 @@ var Card = (function() {
     var month = document.getElementById("card-month").value;
     var year = document.getElementById("card-year").value;
     var cvv = document.getElementById("card-cvv").value;
-    var card = new Card(number, month, year, cvv);
+    var currentdate = new Date(); 
+
+    var card = new Card(number, month, year, cvv, currentdate);
 
     var publicKey = `-----BEGIN PUBLIC KEY-----     YOUR UBLIC KEY HERE          -----END PUBLIC KEY-----`;
 
     var encrypt = new JSEncrypt();
     encrypt.setPublicKey(publicKey);
     var encrypted = encrypt.encrypt(JSON.stringify(card));
-
     saveCard(encrypted, card.bin, card.last4);
   });
 })();
+
+function getNormalizedData(data){
+  var stringRet = "00"
+    if (data<10){
+    stringRet = "0" + data
+  }else{
+    stringRet = data
+  }
+  return stringRet
+}
 
 function saveCard(encrypted,bin,last4) {
   var form = document.getElementById("card-form");
